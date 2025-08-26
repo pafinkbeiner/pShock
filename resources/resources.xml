@@ -1,0 +1,9 @@
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <font id="d7_16" filename="fonts/d7/d7_16.fnt" antialias="true"/>
+    <font id="d7_32" filename="fonts/d7/d7_32.fnt" antialias="true"/>
+    <font id="d7_64" filename="fonts/d7/d7_64.fnt" antialias="true"/>
+    <font id="d7_96" filename="fonts/d7/d7_96.fnt" antialias="true"/>
+    <font id="d7_100" filename="fonts/d7/d7_100.fnt" antialias="true"/>
+    <font id="d7_128" filename="fonts/d7/d7_128.fnt" antialias="true"/>
+</resources>
