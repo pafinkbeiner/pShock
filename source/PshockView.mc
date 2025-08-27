@@ -5,6 +5,7 @@ import Toybox.WatchUi;
 import Toybox.Time;
 import Toybox.Time.Gregorian;
 import Toybox.UserProfile;
+import Toybox.ActivityMonitor;
 
 class PshockView extends WatchUi.WatchFace {
 
@@ -68,9 +69,9 @@ class PshockView extends WatchUi.WatchFace {
         if(clockTime.hour < 10) {
             hourString = Lang.format("0$1$", [clockTime.hour]);
         }
-        var minuteString = Lang.format("$1$", [clockTime.min.format("%02d")]);
+        var minuteString = Lang.format("$1$", [clockTime.min]);
         if(clockTime.min < 10) {
-            minuteString = Lang.format("0$1$", [clockTime.min.format("%02d")]);
+            minuteString = Lang.format("0$1$", [clockTime.min]);
         }
         var timeString = Lang.format("$1$:$2$", [hourString, minuteString]);
         var view = View.findDrawableById("TimeLabel") as Text;
@@ -134,6 +135,36 @@ class PshockView extends WatchUi.WatchFace {
             dateView.width + (2 * borderOffset),  
             dateView.height, 
             5);
+
+        // Steps
+        var info = ActivityMonitor.getInfo();  
+        var stepGoal = info.stepGoal;
+        var steps = info.steps;
+
+        // Draw text
+        var stepsText = steps.toString() + "/" + stepGoal.toString() + " Steps";
+        dc.drawText(w * 0.5, h * 0.66, d7_32, stepsText, Graphics.TEXT_JUSTIFY_CENTER);
+
+        // Progress bar dimensions
+        var barX = w * 0.15;
+        var barY = h * 0.75;
+        var barWidth = w * 0.7;
+        var barHeight = h * 0.05;
+
+        // Outline
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawRoundedRectangle(barX, barY, barWidth, barHeight, 5);
+
+        // Fill percentage
+        var percent = (stepGoal > 0) ? (steps.toFloat() / stepGoal.toFloat()) : 0.0;
+        if (percent > 1) {
+            percent = 1; // cap at 100%
+        }
+
+        // Filled bar
+        var fillWidth = barWidth * percent;
+        dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
+        dc.fillRoundedRectangle(barX + 1, barY + 1, fillWidth - 2, barHeight - 2, 5);
     }
 
     // Called when this View is removed from the screen. Save the
