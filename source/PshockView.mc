@@ -41,28 +41,48 @@ class PshockView extends WatchUi.WatchFace {
 
         // Date
         var today = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-        var dateString = Lang.format("$1$-$2$",[today.month,today.day]);
+        var monthString =  Lang.format("$1$", [today.month]);
+        if(today.month < 10) {
+            monthString = Lang.format("0$1$", [today.month]);
+        }
+        var dayString =  Lang.format("$1$", [today.day]);
+        if(today.day < 10) {
+            dayString = Lang.format("0$1$", [today.day]);
+        }
+        var dateString = Lang.format("$1$-$2$",[monthString, dayString]);
         var dateView = View.findDrawableById("DateLabel") as Text;
+        dateView.setJustification(Graphics.TEXT_JUSTIFY_LEFT);
         dateView.setText(dateString);
         dateView.setFont(d7_64);
-        dateView.setLocation(w * 0.57, h * 0.264);
+        dateView.setLocation(w * 0.5, h * 0.264);
 
         var todayMedium = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
-        var dayString = Lang.format("$1$",[todayMedium.day_of_week]);
+        var dayStringMed = Lang.format("$1$",[todayMedium.day_of_week]);
         var dayLabel = View.findDrawableById("DayLabel") as Text;
-        dayLabel.setText(dayString);
+        dayLabel.setText(dayStringMed);
         dayLabel.setFont(d7_64);
         dayLabel.setLocation(w * 0.25, h * 0.264);
         
         // Time
-        var timeString = Lang.format("$1$:$2$", [clockTime.hour, clockTime.min.format("%02d")]);
+        var hourString = Lang.format("$1$", [clockTime.hour]);
+        if(clockTime.hour < 10) {
+            hourString = Lang.format("0$1$", [clockTime.hour]);
+        }
+        var minuteString = Lang.format("$1$", [clockTime.min.format("%02d")]);
+        if(clockTime.min < 10) {
+            minuteString = Lang.format("0$1$", [clockTime.min.format("%02d")]);
+        }
+        var timeString = Lang.format("$1$:$2$", [hourString, minuteString]);
         var view = View.findDrawableById("TimeLabel") as Text;
         view.setText(timeString);
         view.setFont(d7_128);
-        view.setLocation(w * 0.40, h * 0.40);
+        view.setLocation(w * 0.74, h * 0.40);
 
         // Seconds
         var secondString = Lang.format("$1$", [clockTime.sec]);
+        if(clockTime.sec < 10) {
+            secondString = Lang.format("0$1$", [clockTime.sec]);
+        }
         var secondsView = View.findDrawableById("SecondLabel") as Text;
         secondsView.setText(secondString);
         secondsView.setFont(d7_64);
@@ -107,10 +127,13 @@ class PshockView extends WatchUi.WatchFace {
 
         // Border
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        // dc.drawRoundedRectangle(w * 0.15, h * 0.25, w * 0.7,  h * 0.5, 5);
-
-        // Date Border
-        dc.drawRoundedRectangle(w * 0.48,  h * 0.26, w * 0.36,  h * 0.15, 5);
+        var borderOffset = 5;
+        dc.drawRoundedRectangle(
+            dateView.locX - borderOffset,  
+            dateView.locY, 
+            dateView.width + (2 * borderOffset),  
+            dateView.height, 
+            5);
     }
 
     // Called when this View is removed from the screen. Save the
