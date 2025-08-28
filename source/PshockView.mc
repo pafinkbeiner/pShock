@@ -105,7 +105,11 @@ class PshockView extends WatchUi.WatchFace {
         var systemStats = System.getSystemStats();
         var battery = systemStats.battery;
         var batteryInDays = systemStats.batteryInDays;
-        dc.drawText(w * 0.5, h * 0.1, d7_32, battery.toNumber().toString() + "%" + " (" + batteryInDays.toNumber().toString() + " days)", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(w * 0.5, h * 0.07, d7_32, battery.toNumber().toString() + "%" + " (" + batteryInDays.toNumber().toString() + " days)", Graphics.TEXT_JUSTIFY_CENTER);
+
+        // Stress
+        var stress = ActivityMonitor.getInfo().stressScore;  
+        dc.drawText(w * 0.5, h * 0.16, d7_32, "Stress: " + stress + " /100", Graphics.TEXT_JUSTIFY_CENTER);
 
         // VO2 Max
         var profile = UserProfile.getProfile();
