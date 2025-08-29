@@ -108,8 +108,12 @@ class PshockView extends WatchUi.WatchFace {
         dc.drawText(w * 0.5, h * 0.07, d7_32, battery.toNumber().toString() + "%" + " (" + batteryInDays.toNumber().toString() + " days)", Graphics.TEXT_JUSTIFY_CENTER);
 
         // Stress
-        var stress = ActivityMonitor.getInfo().stressScore;  
-        dc.drawText(w * 0.5, h * 0.16, d7_32, "Stress: " + stress + " /100", Graphics.TEXT_JUSTIFY_CENTER);
+        var stress = ActivityMonitor.getInfo().stressScore;
+        if(stress != null) {
+            dc.drawText(w * 0.5, h * 0.16, d7_32, "Stress: " + stress + " /100", Graphics.TEXT_JUSTIFY_CENTER);
+        } else {
+            dc.drawText(w * 0.5, h * 0.16, d7_32, "Stress: " + "--" + " /100", Graphics.TEXT_JUSTIFY_CENTER);
+        }
 
         // VO2 Max
         var profile = UserProfile.getProfile();
@@ -146,7 +150,7 @@ class PshockView extends WatchUi.WatchFace {
         var steps = info.steps;
 
         // Draw text
-        var stepsText = steps.toString() + "/" + stepGoal.toString() + " Steps";
+        var stepsText = steps.toString() + " / " + stepGoal.toString() + " Steps";
         dc.drawText(w * 0.5, h * 0.66, d7_32, stepsText, Graphics.TEXT_JUSTIFY_CENTER);
 
         // Progress bar dimensions
