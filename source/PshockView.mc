@@ -1,3 +1,4 @@
+import Toybox.Application;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
@@ -10,6 +11,24 @@ import Toybox.ActivityMonitor;
 class PshockView extends WatchUi.WatchFace {
 
     private var d7_16, d7_32, d7_64, d7_96, d7_100, d7_128;
+    private var textColor as Number = Graphics.COLOR_WHITE;
+
+    // Get the text color from settings
+    function getTextColor() as Number {
+        var colorSetting = Application.Properties.getValue("TextColor");
+        if (colorSetting == null) {
+            return Graphics.COLOR_WHITE;
+        }
+        switch (colorSetting) {
+            case 0: return Graphics.COLOR_WHITE;
+            case 1: return Graphics.COLOR_RED;
+            case 2: return Graphics.COLOR_GREEN;
+            case 3: return Graphics.COLOR_BLUE;
+            case 4: return Graphics.COLOR_YELLOW;
+            case 5: return Graphics.COLOR_ORANGE;
+            default: return Graphics.COLOR_WHITE;
+        }
+    }
 
     function initialize() {
         WatchFace.initialize();
@@ -37,6 +56,9 @@ class PshockView extends WatchUi.WatchFace {
         var w = dc.getWidth();
         var h = dc.getHeight();
 
+        // Get the current text color from settings
+        textColor = getTextColor();
+
         // Get and show the current time
         var clockTime = System.getClockTime();
 
@@ -56,6 +78,7 @@ class PshockView extends WatchUi.WatchFace {
         dateView.setText(dateString);
         dateView.setFont(d7_64);
         dateView.setLocation(w * 0.5, h * 0.264);
+        dateView.setColor(textColor);
 
         var todayMedium = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
         var dayStringMed = Lang.format("$1$",[todayMedium.day_of_week]);
@@ -63,6 +86,7 @@ class PshockView extends WatchUi.WatchFace {
         dayLabel.setText(dayStringMed);
         dayLabel.setFont(d7_64);
         dayLabel.setLocation(w * 0.25, h * 0.264);
+        dayLabel.setColor(textColor);
         
         // Time
         var hourString = Lang.format("$1$", [clockTime.hour]);
@@ -78,6 +102,7 @@ class PshockView extends WatchUi.WatchFace {
         view.setText(timeString);
         view.setFont(d7_128);
         view.setLocation(w * 0.74, h * 0.40);
+        view.setColor(textColor);
 
         // Seconds
         var secondString = Lang.format("$1$", [clockTime.sec]);
@@ -88,11 +113,13 @@ class PshockView extends WatchUi.WatchFace {
         secondsView.setText(secondString);
         secondsView.setFont(d7_64);
         secondsView.setLocation(w * 0.82, h * 0.515);
+        secondsView.setColor(textColor);
 
         // Call the parent onUpdate function to redraw the layout
         View.onUpdate(dc);
 
         // Heart rate
+        dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
         var hrInfo = Activity.getActivityInfo().currentHeartRate;
         if (hrInfo != null) {
             var hrString = hrInfo + " bpm";
@@ -102,12 +129,14 @@ class PshockView extends WatchUi.WatchFace {
         }
 
         // Batterie
+        dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
         var systemStats = System.getSystemStats();
         var battery = systemStats.battery;
         var batteryInDays = systemStats.batteryInDays;
         dc.drawText(w * 0.5, h * 0.07, d7_32, battery.toNumber().toString() + "%" + " (" + batteryInDays.toNumber().toString() + " days)", Graphics.TEXT_JUSTIFY_CENTER);
 
         // Stress
+        dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
         var stress = ActivityMonitor.getInfo().stressScore;
         if(stress != null) {
             dc.drawText(w * 0.5, h * 0.16, d7_32, "Stress: " + stress + " /100", Graphics.TEXT_JUSTIFY_CENTER);
@@ -116,6 +145,7 @@ class PshockView extends WatchUi.WatchFace {
         }
 
         // VO2 Max
+        dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
         var profile = UserProfile.getProfile();
         if (profile != null) {
             var vo2run = profile.vo2maxRunning;
@@ -127,6 +157,7 @@ class PshockView extends WatchUi.WatchFace {
         }
 
         // AM / PM
+        dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
         var deviceSettings = System.getDeviceSettings();
         var is24Hour = deviceSettings.is24Hour;
         if(!is24Hour) {
@@ -135,7 +166,7 @@ class PshockView extends WatchUi.WatchFace {
         }
 
         // Border
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
         var borderOffset = 5;
         dc.drawRoundedRectangle(
             dateView.locX - borderOffset,  
@@ -150,6 +181,7 @@ class PshockView extends WatchUi.WatchFace {
         var steps = info.steps;
 
         // Draw text
+        dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
         var stepsText = steps.toString() + " / " + stepGoal.toString() + " Steps";
         dc.drawText(w * 0.5, h * 0.66, d7_32, stepsText, Graphics.TEXT_JUSTIFY_CENTER);
 
@@ -160,18 +192,23 @@ class PshockView extends WatchUi.WatchFace {
         var barHeight = h * 0.05;
 
         // Outline
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
         dc.drawRoundedRectangle(barX, barY, barWidth, barHeight, 5);
 
         // Fill percentage
         var percent = (stepGoal > 0) ? (steps.toFloat() / stepGoal.toFloat()) : 0.0;
+        var goalReached = (percent >= 1.0);
         if (percent > 1) {
             percent = 1; // cap at 100%
         }
 
-        // Filled bar
+        // Filled bar - green when goal reached, dark gray otherwise
         var fillWidth = barWidth * percent;
-        dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
+        if (goalReached) {
+            dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+        } else {
+            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
+        }
         dc.fillRoundedRectangle(barX + 1, barY + 1, fillWidth - 2, barHeight - 2, 5);
     }
 

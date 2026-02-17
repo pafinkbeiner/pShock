@@ -21,6 +21,11 @@ class PshockApp extends Application.AppBase {
         return [ new PshockView() ];
     }
 
+    // Return the settings view when user long-presses the watchface
+    function getSettingsView() as [Views] or [Views, InputDelegates] or Null {
+        return [new PshockSettingsMenu(), new PshockSettingsDelegate()];
+    }
+
 }
 
 function getApp() as PshockApp {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<properties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <!-- Text color property: 0=White, 1=Red, 2=Green, 3=Blue -->
+    <property id="TextColor" type="number">0</property>
+</properties>
